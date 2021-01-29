@@ -15,9 +15,7 @@ import scipy.linalg as SL
 # from assimulo.solvers import CVode
 
 class BDF_4(Explicit_ODE):
-    """
-    BDF-4   (Example of how to set-up own integrators for Assimulo)
-    """
+
     tol=1.e-8     
     maxit=10000     
     maxsteps=5000
@@ -41,9 +39,7 @@ class BDF_4(Explicit_ODE):
     h=property(_get_h,_set_h)
         
     def integrate(self, t, y, tf, opts):
-        """
-        _integrates (t,y) values until t > tf
-        """
+
         h = self.options["h"]
         h = min(h, abs(tf-t))
         
@@ -57,6 +53,7 @@ class BDF_4(Explicit_ODE):
             self.statistics["nsteps"] += 1
             
             if i==0:  # initial step
+                #use wind up 
                 t_np1,y_np1 = self.step_EE(t,y, h)
                 t_np2,y_np2 = self.step_BDF2([t_np1, t], [y_np1, y], h)
                 t_np3,y_np3 = self.step_BDF3([t_np2, t_np1, t], [y_np2, y_np1, y], h)
@@ -80,21 +77,13 @@ class BDF_4(Explicit_ODE):
         return ID_PY_OK, tres, yres
     
     def step_EE(self, t, y, h):
-        """
-        This calculates the next step in the integration with explicit Euler.
-        """
         self.statistics["nfcns"] += 1
         
         f = self.problem.rhs
         return t + h, y + h*f(t, y) 
         
     def step_BDF4(self,T,Y, h):
-        """
-        BDF-4 with Fixed Point Iteration and Zero order predictor
-        
-        alpha_0*y_np1+alpha_1*y_n+alpha_2*y_nm1=h f(t_np1,y_np1)
-        alpha=[3/2,-2,1/2]
-        """
+
         alpha=[25./12.,-4.,3,-4./3,1./4]
         f=self.problem.rhs
         
@@ -113,12 +102,7 @@ class BDF_4(Explicit_ODE):
             
     
     def step_BDF3(self,T,Y, h):
-        """
-        BDF-3 with Fixed Point Iteration and Zero order predictor
-        
-        alpha_0*y_np1+alpha_1*y_n+alpha_2*y_nm1=h f(t_np1,y_np1)
-        alpha=[3/2,-2,1/2]
-        """
+
         alpha=[11./6.,-3.,3./2,-1./3]
         f=self.problem.rhs
         
@@ -136,12 +120,7 @@ class BDF_4(Explicit_ODE):
             raise Explicit_ODE_Exception('fsolve could not resolve next step')
             
     def step_BDF2(self,T,Y, h):
-        """
-        BDF-2 with Fixed Point Iteration and Zero order predictor
-        
-        alpha_0*y_np1+alpha_1*y_n+alpha_2*y_nm1=h f(t_np1,y_np1)
-        alpha=[3/2,-2,1/2]
-        """
+
         alpha=[3./2.,-2.,1./2]
         f=self.problem.rhs
         
@@ -168,29 +147,4 @@ class BDF_4(Explicit_ODE):
         self.log_message(' Solver            : BDF4',                     verbose)
         self.log_message(' Solver type       : Fixed step\n',                      verbose)
             
-        
-'''
-#Define the rhs
-def f(t,y):
-    ydot = -y[0]
-    return np.array([ydot])
     
-#Define an Assimulo problem
-exp_mod = Explicit_Problem(f, 4)
-exp_mod.name = 'Simple BDF-4 Example'
-
-#Define another Assimulo problem
-def pend(t,y):
-    #g=9.81    l=0.7134354980239037
-    gl=13.7503671
-    return np.array([y[1],-gl*np.sin(y[0])])
-    
-pend_mod=Explicit_Problem(pend, y0=np.array([2.*np.pi,1.]))
-pend_mod.name='Nonlinear Pendulum'
-
-#Define an explicit solver
-exp_sim = BDF_4(pend_mod) #Create a BDF solver
-t, y = exp_sim.simulate(4)
-exp_sim.plot()
-mpl.show()
-'''
