@@ -30,8 +30,8 @@ def rhs(t,y):
 
 
 
-xinit = np.sin(20*np.pi/180)+0.1
-yinit = np.cos(20*np.pi/180)+0.1
+xinit = np.sin(20*np.pi/180)+0.05
+yinit = np.cos(20*np.pi/180)+0.05
 sqrt2 = np.sqrt(0.5);
 y0 = np.array([xinit, yinit, 0.0, 0])
 t0 = 0.0

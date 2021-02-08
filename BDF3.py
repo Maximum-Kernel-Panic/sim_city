@@ -8,6 +8,7 @@ Created on Thu Jan 21 20:28:50 2021
 from assimulo.explicit_ode import Explicit_ODE
 from assimulo.ode import *
 import numpy as np
+import scipy as sp
 import matplotlib.pyplot as mpl
 import scipy.linalg as SL
 # from assimulo.solvers import CVode
@@ -69,7 +70,7 @@ class BDF_3(Explicit_ODE):
             
             tres.append(t)
             yres.append(y.copy())
-            print(i)
+            'print(i)'
             h=min(self.h,np.abs(tf-t))
         else:
             raise Explicit_ODE_Exception('Final time not reached within maximum number of steps')
