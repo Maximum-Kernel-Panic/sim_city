@@ -30,6 +30,7 @@ class Seven_bar_mechanism(ap.Implicit_Problem):
 			98.5668703962410896057654982170,        # lambda[0]
 			-6.12268834425566265503114393122])       # lambda[1]			
 		y=hstack((y_1,zeros((7,)),lamb,zeros((4,))))
+        # order goes [q,qdot,lamb]
 		yp=hstack((zeros(7,),array([
 			14222.4439199541138705911625887,        #  betadotdot
 			-10666.8329399655854029433719415,       #  Thetadotdot
@@ -142,6 +143,7 @@ class Seven_bar_mechanism(ap.Implicit_Problem):
 		res_1 = yp[0:7] - y[7:14]
 		res_2 = dot(m,yp[7:14])- ff[0:7]+dot(gp.T,lamb)
 		res_3 = g
+		res_4 = dot(gp,y[7:14])
 	
 		return hstack((res_1,res_2,res_3))
 
