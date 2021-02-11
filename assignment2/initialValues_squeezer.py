@@ -15,8 +15,8 @@ class initialValues_squeezer():
         self.beta=beta
         self.q0=self.getInitQ(beta)
         self.qddlambda=self.getqddlambda(self.q0)
-        self.y=hstack(self.q0,zeros((7,)),self.qddlambda[7:])
-        self.yp=hstack(zeros(7),self.qddlambda[0:6],zeros(7))
+        self.y=hstack((self.q0,zeros((7,)),self.qddlambda[7:]))
+        self.yp=hstack((zeros(7),self.qddlambda[0:6],zeros(7)))
     
     def getqddlambda(self,y):
         """
@@ -139,5 +139,5 @@ class initialValues_squeezer():
         g_5 =lambda x: rr*sin(beta) - d*sibeth(x) - zf*siomep(x) + u*cos(x[5]) - ya        
         
         f=lambda x: [g_0(x),g_1(x),g_2(x),g_3(x),g_4(x),g_5(x)]
-        return concatenate([beta],fsolve(f,zeros(6)))
+        return concatenate((array([beta]),fsolve(f,zeros(6))))
         
