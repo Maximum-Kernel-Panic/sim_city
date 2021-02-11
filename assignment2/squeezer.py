@@ -17,8 +17,9 @@ class Seven_bar_mechanism(ap.Implicit_Problem):
     Hairer, Vol. II, p. 533 ff, see also formula (7.11)
     """
     problem_name='Woodpecker w/o friction'
-    def __init__(self):
+    def __init__(self, index2_bool):
         self.y0,self.yd0=self.init_squeezer()
+        self.index2_bool = index2_bool
         
     def init_squeezer(self):
         y_1 = array([-0.0617138900142764496358948458001,  #  beta
@@ -146,15 +147,28 @@ class Seven_bar_mechanism(ap.Implicit_Problem):
         g[3] = rr*sibe - d*sibeth + e*cophde - zt*side - ya
         g[4] = rr*cobe - d*cobeth - zf*coomep - u*siep - xa
         g[5] = rr*sibe - d*sibeth - zf*siomep + u*coep - ya
-
+        
+        
+        # gqq construction
+        
+        gqq = zeros((6,))
+        gqq[0] = -rr*cobe*bep**2 + d*cobeth*(bep+thp)**2 + ss*siga*gap**2
+        gqq[1] = -rr*sibe*bep**2 + d*sibeth*(bep+thp)**2 - ss*coga*gap**2
+        gqq[2] = -rr*cobe*bep**2 + d*cobeth*(bep+thp)**2 + e*siphde*(php+dep)**2 + zt*code*dep**2
+        gqq[3] = -rr*sibe*bep**2 + d*sibeth*(bep+thp)**2 - e*cophde*(php+dep)**2 + zt*side*dep**2
+        gqq[4] = -rr*cobe*bep**2 + d*cobeth*(bep+thp)**2 + zf+coomep*(omp+epp)**2 + u*siep*epp**2
+        gqq[5] = -rr*sibe*bep**2 + d*sibeth*(bep+thp)**2 + zf*siomep*(omp+epp)**2 - u*coep*epp**2
+        
         #     Construction of the residual
 
         res_1 = yp[0:7] - y[7:14]
         res_2 = dot(m,yp[7:14])- ff[0:7]+dot(gp.T,lamb)
         res_3 = g
-        res_4 = dot(gp,y[7:14])
-    
-        return hstack((res_1,res_2,res_3,res_4))
+        if self.index2_bool:
+            res_4 = dot(gp,y[7:14])
+            return hstack((res_1,res_2,res_3,res_4))
+        else: 
+            return hstack((res_1,res_2,res_3))
     
     def getInitQ(self,beta):
         xa,ya=-.06934,-.00227
