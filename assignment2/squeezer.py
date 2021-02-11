@@ -17,8 +17,9 @@ class Seven_bar_mechanism(ap.Implicit_Problem):
     Hairer, Vol. II, p. 533 ff, see also formula (7.11)
     """
     problem_name='Woodpecker w/o friction'
-    def __init__(self):
+    def __init__(self, index2_bool):
         self.y0,self.yd0=self.init_squeezer()
+        self.index2_bool = index2_bool
         
     def init_squeezer(self):
         y_1 = array([-0.0617138900142764496358948458001,  #  beta
@@ -163,9 +164,11 @@ class Seven_bar_mechanism(ap.Implicit_Problem):
         res_1 = yp[0:7] - y[7:14]
         res_2 = dot(m,yp[7:14])- ff[0:7]+dot(gp.T,lamb)
         res_3 = g
-        res_4 = dot(gp,y[7:14])
-    
-        return hstack((res_1,res_2,res_3,res_4))
+        if self.index2_bool:
+            res_4 = dot(gp,y[7:14])
+            return hstack((res_1,res_2,res_3,res_4))
+        else: 
+            return hstack((res_1,res_2,res_3))
     
     def getInitQ(self,beta):
         xa,ya=-.06934,-.00227

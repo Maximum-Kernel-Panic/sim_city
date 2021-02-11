@@ -12,9 +12,11 @@ import matplotlib.pyplot as plt
 from assimulo.problem import Implicit_Problem
 from assimulo.solvers import IDA
 import squeezer
+from initialValues_squeezer import *
 
+iv = initialValues_squeezer(0)
 
-a = squeezer.Seven_bar_mechanism()
+a = squeezer.Seven_bar_mechanism(True)
 t0 = 0
 y0, yp0 = a.init_squeezer()
 
