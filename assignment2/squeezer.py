@@ -163,11 +163,12 @@ class Seven_bar_mechanism(ap.Implicit_Problem):
 
         res_1 = yp[0:7] - y[7:14]
         res_2 = dot(m,yp[7:14])- ff[0:7]+dot(gp.T,lamb)
-        res_3 = g
         if self.index2_bool:
-            res_4 = dot(gp,y[7:14])
-            return hstack((res_1,res_2,res_3,res_4))
-        else: 
+            res_3 = dot(gp,y[7:14])
+            return hstack((res_1,res_2,res_3))
+        else:
+            
+            res_3 = g
             return hstack((res_1,res_2,res_3))
     
     def getInitQ(self,beta):
