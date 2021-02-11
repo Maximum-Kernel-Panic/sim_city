@@ -7,6 +7,8 @@ from scipy import *
 from numpy import array, concatenate, transpose, shape, linalg, inner
 import sys
 import os
+from scipy.optimize import fsolve as fsolve
+
 from PIL import Image
 
 class Seven_bar_mechanism(ap.Implicit_Problem):
@@ -153,6 +155,28 @@ class Seven_bar_mechanism(ap.Implicit_Problem):
         res_4 = dot(gp,y[7:14])
     
         return hstack((res_1,res_2,res_3,res_4))
+    
+    def getInitQ(self,beta):
+        xa,ya=-.06934,-.00227
+        xb,yb=-0.03635,.03273    
+        d=28.e-3
+        rr=7.e-3
+        ss=35.e-3
+        u=4.e-2
+        zf,zt=2.e-2,4.e-2
+        e=2.e-2
+        sibeth =lambda x: sin(beta+x[0]);cobeth =lambda x: cos(beta+x[0])
+        siphde =lambda x: sin(x[2]+x[3]);cophde =lambda x: cos(x[2]+x[3])
+        siomep =lambda x: sin(x[4]+x[5]);coomep =lambda x: cos(x[4]+x[5])
+        g_0 =lambda x: rr*cos(beta) - d*cobeth(x) - ss*sin(x[1]) - xb
+        g_1 =lambda x: rr*sin(beta) - d*sibeth(x) + ss*cos(x[1]) - yb
+        g_2 =lambda x: rr*cos(beta) - d*cobeth(x) - e*siphde(x) - zt*cos(x[3]) - xa
+        g_3 =lambda x: rr*sin(beta) - d*sibeth(x) + e*cophde(x) - zt*sin(x[3]) - ya
+        g_4 =lambda x: rr*cos(beta) - d*cobeth(x) - zf*coomep(x) - u*sin(x[5]) - xa
+        g_5 =lambda x: rr*sin(beta) - d*sibeth(x) - zf*siomep(x) + u*cos(x[5]) - ya        
+        
+        f=lambda x: [g_0(x),g_1(x),g_2(x),g_3(x),g_4(x),g_5(x)]
+        return fsolve(f,zeros(6))
 
 
     
