@@ -149,16 +149,6 @@ class Seven_bar_mechanism(ap.Implicit_Problem):
         g[5] = rr*sibe - d*sibeth - zf*siomep + u*coep - ya
         
         
-        # gqq construction
-        
-        gqq = zeros((6,))
-        gqq[0] = -rr*cobe*bep**2 + d*cobeth*(bep+thp)**2 + ss*siga*gap**2
-        gqq[1] = -rr*sibe*bep**2 + d*sibeth*(bep+thp)**2 - ss*coga*gap**2
-        gqq[2] = -rr*cobe*bep**2 + d*cobeth*(bep+thp)**2 + e*siphde*(php+dep)**2 + zt*code*dep**2
-        gqq[3] = -rr*sibe*bep**2 + d*sibeth*(bep+thp)**2 - e*cophde*(php+dep)**2 + zt*side*dep**2
-        gqq[4] = -rr*cobe*bep**2 + d*cobeth*(bep+thp)**2 + zf+coomep*(omp+epp)**2 + u*siep*epp**2
-        gqq[5] = -rr*sibe*bep**2 + d*sibeth*(bep+thp)**2 + zf*siomep*(omp+epp)**2 - u*coep*epp**2
-        
         #     Construction of the residual
 
         res_1 = yp[0:7] - y[7:14]
@@ -166,8 +156,7 @@ class Seven_bar_mechanism(ap.Implicit_Problem):
         if self.index2_bool:
             res_3 = dot(gp,y[7:14])
             return hstack((res_1,res_2,res_3))
-        else:
-            
+        else: 
             res_3 = g
             return hstack((res_1,res_2,res_3))
     
