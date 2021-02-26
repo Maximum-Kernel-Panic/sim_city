@@ -10,8 +10,8 @@ from assimulo.ode import *
 
 class Explicit_Problem_2nd(Explicit_Problem):
     
-    def __init__(rhs, y0, t0, M=None, K=None, C=None):
-        Explicit_Problem.__init__(rhs, y0, t0)
+    def __init__(self, rhs, y0, t0, M=None, K=None, C=None):
+        Explicit_Problem.__init__(self,rhs, y0, t0)
         self.M  = M;
         self.C = C;
         self.K = K;
