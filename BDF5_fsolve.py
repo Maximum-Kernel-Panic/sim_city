@@ -13,7 +13,7 @@ import numpy as np
 import matplotlib.pyplot as mpl
 import scipy.linalg as SL
 
-class BDF_4(Explicit_ODE):
+class BDF_5(Explicit_ODE):
 
     tol=1.e-8     
     maxit=10000     
@@ -56,14 +56,15 @@ class BDF_4(Explicit_ODE):
                 t_np1,y_np1 = self.step_EE(t,y, h)
                 t_np2,y_np2 = self.step_BDF2([t_np1, t], [y_np1, y], h)
                 t_np3,y_np3 = self.step_BDF3([t_np2, t_np1, t], [y_np2, y_np1, y], h)
+                t_np4,y_np4 = self.step_BDF4([t_np3, t_np2, t_np1, t], [y_np3, y_np2, y_np1, y], h)
                 
-                t, t_nm1, t_nm2, t_nm3 = t_np3, t_np2, t_np1, t
-                y, y_nm1, y_nm2, y_nm3 = y_np3, y_np2, y_np1, y
-                i = i + 2
+                t, t_nm1, t_nm2, t_nm3, t_nm4 = t_np4, t_np3, t_np2, t_np1, t
+                y, y_nm1, y_nm2, y_nm3, t_nm4 = y_np4, y_np3, y_np2, y_np1, y
+                i = i + 3
             else:   
                 t_np1, y_np1 = self.step_BDF4([t,t_nm1,t_nm2,t_nm3], [y,y_nm1,y_nm2,y_nm3], h)
-                t, t_nm1, t_nm2, t_nm3 = t_np1, t, t_nm1, t_nm2
-                y, y_nm1, y_nm2, y_nm3 = y_np1, y, y_nm1, y_nm2
+                t, t_nm1, t_nm2, t_nm3, t_nm4 = t_np1, t, t_nm1, t_nm2, t_nm3
+                y, y_nm1, y_nm2, y_nm3, y_nm4 = y_np1, y, y_nm1, y_nm2, y_nm3
             
             
             tres.append(t)
@@ -81,6 +82,26 @@ class BDF_4(Explicit_ODE):
         f = self.problem.rhs
         return t + h, y + h*f(t, y) 
         
+    
+    
+    def step_BDF5(self,T,Y, h):
+
+        alpha=[-5.,5.,-10./3,5./4,-1./5]
+        f=self.problem.rhs
+        
+        t_n,t_nm1,t_nm2,t_nm3, t_nm4 =T
+        y_n,y_nm1,y_nm2,y_nm3, y_nm4 =Y
+        # predictor
+        t_np1=t_n+h
+        y_np1_i=y_n   # zero order predictor
+        
+        try:
+            res = lambda y : h*f(t_np1,y) - (alpha[0]*y+alpha[1]*y_n+alpha[2]*y_nm1+alpha[3]*y_nm2+alpha[4]*y_nm3+alpha[5]*y_nm4)
+            y_np1 = fsolve(res, y_np1_i)
+            return t_np1, y_np1
+        except:
+            raise Explicit_ODE_Exception('fsolve could not resolve next step')
+    
     def step_BDF4(self,T,Y, h):
 
         alpha=[25./12.,-4.,3,-4./3,1./4]

@@ -11,16 +11,19 @@ import scipy as sp
 import matplotlib.pyplot as plt
 from assimulo.problem import Implicit_Problem
 from assimulo.solvers import IDA
+import initialValues_squeezer
 import squeezer
-from initialValues_squeezer import *
 
-iv = initialValues_squeezer(0)
 
-a = squeezer.Seven_bar_mechanism(True)
+a = squeezer.Seven_bar_mechanism()
 t0 = 0
+'''
+initvals = initialValues_squeezer.initialValues_squeezer(1)
+y0 = initvals.y
+yp0 = initvals.yp
+'''
+
 y0, yp0 = a.init_squeezer()
-
-
 model = Implicit_Problem(a.f, y0, yp0, t0) #Create an Assimulo problem
 sim = IDA(model)
 sim.atol[7:20] = 10000
@@ -30,7 +33,7 @@ te = 0.03
 t, y, yp =  sim.simulate(te)
 #sim.plot()
 plt.plot(t,y[:,0],label='beta')
-plt.plot(t,y[:,1],label='omega')
+plt.plot(t,y[:,1],label='theta')
 plt.plot(t,y[:,2],label='gamma')
 plt.plot(t,y[:,3],label='phi')
 plt.plot(t,y[:,4],label='delta')
