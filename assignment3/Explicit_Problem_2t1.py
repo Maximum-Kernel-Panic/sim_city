@@ -40,7 +40,7 @@ class Explicit_Problem_2_to_1wrap():
         return model
         
 
-    
+'''
 
 def rhs1(t, y, v):
     
@@ -63,7 +63,6 @@ def rhs2(t,y):
     return yd
 
 
-'''
 
 s2 = 1/np.sqrt(2)
 x0 = np.array([-s2+0.05,-s2+0.05])

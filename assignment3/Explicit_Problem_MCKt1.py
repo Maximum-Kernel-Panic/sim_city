@@ -10,9 +10,9 @@ import numpy as np
 import Explicit_Problem_2t1 as c2t1
 from assimulo.ode import *
 from scipy.linalg import inv
-from assimulo.solvers import CVode
+#from assimulo.solvers import CVode
 from assimulo.explicit_ode import Explicit_ODE
-import matplotlib.pyplot as mpl
+#import matplotlib.pyplot as mpl
 
 class Explicit_Problem_MCK_to_1wrap():
     
