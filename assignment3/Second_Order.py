@@ -7,17 +7,18 @@ Created on Thu Feb 25 14:34:49 2021
 from assimulo.ode import *
 from assimulo.explicit_ode import Explicit_ODE
 
-import numpy.linalg as np
+import numpy.linalg as nplin
+import numpy as np
 class Second_Order(Explicit_ODE):
     tol=1.e-5     
     maxit=100000     
-    maxsteps=5000
+    maxsteps=200000
     
     def __init__(self, problem):
         Explicit_ODE.__init__(self, problem) #Calls the base class
         
         #Solver options
-        self.options["h"] = 0.01
+        self.options["h"] = 0.001
         
         #Statistics
         self.statistics["nsteps"] = 0
@@ -51,19 +52,18 @@ class Second_Order(Explicit_ODE):
             self.statistics["nsteps"] += 1
             
             if i==0:  # initial step
-                print(y)
-                [y,yp]=y
-                t,ypp = self.step_Newmark_init(t,y,yp, h,opts)
+                yp=y[int(len(y)/2):]
+                y=y[:int(len(y)/2)]
+                t,ypp = self.step_Newmark_explicit_init(t,y,yp, h,opts)
                 i = i + 1
             else:   
-                t,y,yp,ypp = self.step_Newmark(t,y,yp,ypp, h,opts)
+                t,y,yp,ypp = self.step_Newmark_explicit(t,y,yp,ypp, h,opts)
             
             
             tres.append(t)
             yres.append(y.copy())
             ypres.append(yp.copy())
             yppres.append(ypp.copy())
-            print(i)
             h=min(self.h,np.abs(tf-t))
         else:
             raise Explicit_ODE_Exception('Final time not reached within maximum number of steps')
@@ -80,7 +80,6 @@ class Second_Order(Explicit_ODE):
         M = self.problem.M
         C = self.problem.C
         K = self.problem.K
-        [alpha,gamma]=opts
         if C==None:
             ypp=np.linalg.solve(M,f(t,y)-K(t,y)*y)
         else:

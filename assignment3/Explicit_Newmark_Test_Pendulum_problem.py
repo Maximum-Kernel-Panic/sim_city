@@ -15,16 +15,8 @@ import Second_Order as newmark
 
 
 
-def rhs(t,y):
-    k = 2000
-    lmd = k*(np.sqrt(y[0]*y[0] + y[1]*y[1])-1)/np.sqrt(y[0]*y[0] + y[1]*y[1])
-    y4d = -y[1]*lmd-1
-    y3d = -y[0]*lmd
-    y2d = y[3]
-    y1d = y[2]
-    
+def rhs(t,y):    
     yd = np.array([0, -1])
-    
     return yd
 
 def K(t,y):
