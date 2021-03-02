@@ -105,7 +105,7 @@ class HHT_a(Explicit_ODE):
             # eq 7'
             uptp1 = (self.gamma/self.beta)*(utp1-u)/h + (1 - self.gamma/self.beta)*up + (1 - (self.gamma/(2*self.beta)))*h*upp
             
-            ytp1 = [utp1 uptp1 upptp1]
+            ytp1 = [utp1, uptp1, upptp1]
             return ytp1
             
     def print_statistics(self, verbose=NORMAL):
