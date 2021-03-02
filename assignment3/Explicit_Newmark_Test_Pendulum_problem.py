@@ -22,9 +22,7 @@ def rhs(t,y):
 def K(t,y):
     k = 2000
     lmd = k*(np.sqrt(y[0]*y[0] + y[1]*y[1])-1)/np.sqrt(y[0]*y[0] + y[1]*y[1])
-    y4d = -y[1]*lmd
-    y3d = -y[0]*lmd
-    yd=np.array([y3d,y4d])
+    yd=np.array([[lmd,0],[0,lmd]])
     return yd
 
 
@@ -40,7 +38,7 @@ model = Explicit_Problem_2nd.Explicit_Problem_2nd(rhs, y0, t0,M=np.eye(2),K=K)
 model.name = 'Linear Test ODE'
 
 sim = newmark.Second_Order(model)
-tfinal = 20.0
+tfinal = 20
 
 t, y = sim.simulate(tfinal)
 mpl.plot(t,y[:,0])

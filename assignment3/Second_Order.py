@@ -61,13 +61,15 @@ class Second_Order(Explicit_ODE):
             
             
             tres.append(t)
-            yres.append(y.copy())
+            yres.append(np.concatenate((y.copy(),yp.copy())))
             ypres.append(yp.copy())
             yppres.append(ypp.copy())
             h=min(self.h,np.abs(tf-t))
         else:
             raise Explicit_ODE_Exception('Final time not reached within maximum number of steps')
         
+        print(type(yres))
+        print(len(yres))
         return ID_PY_OK, tres, yres
     
     def step_Newmark_explicit_init(self, t, y, yp, h,opts):
@@ -81,9 +83,9 @@ class Second_Order(Explicit_ODE):
         C = self.problem.C
         K = self.problem.K
         if C==None:
-            ypp=np.linalg.solve(M,f(t,y)-K(t,y)*y)
+            ypp=np.linalg.solve(M,f(t,y)-K(t,y)@y)
         else:
-            ypp=np.linalg.solve(M,f(t,y)-C*yp-K(t,y)*y)              
+            ypp=np.linalg.solve(M,f(t,y)-C*yp-K(t,y)@y)              
         return t + h, ypp
     
     def step_Newmark_explicit(self,t,y,yp,ypp,h,opts):
@@ -93,9 +95,9 @@ class Second_Order(Explicit_ODE):
         K = self.problem.K        
         y=y+yp*h+ypp*h**2/2
         if C==None:
-            ypp_new=np.linalg.solve(M,f(t,y)-K(t,y)*y)
+            ypp_new=np.linalg.solve(M,f(t,y)-K(t,y)@y)
         else:
-            ypp_new=np.linalg.solve(M,f(t,y)-C*yp-K(t,y)*y)            
+            ypp_new=np.linalg.solve(M,f(t,y)-C@yp-K(t,y)@y)            
         yp=yp+ypp*h/2+ypp_new*h/2
         return t+h,y,yp,ypp_new
             
