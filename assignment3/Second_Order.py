@@ -18,7 +18,7 @@ class Second_Order(Explicit_ODE):
         Explicit_ODE.__init__(self, problem) #Calls the base class
         
         #Solver options
-        self.options["h"] = 0.001
+        self.options["h"] = 0.005
         
         #Statistics
         self.statistics["nsteps"] = 0
@@ -85,7 +85,7 @@ class Second_Order(Explicit_ODE):
         if C==None:
             ypp=np.linalg.solve(M,f(t,y)-K(t,y)@y)
         else:
-            ypp=np.linalg.solve(M,f(t,y)-C*yp-K(t,y)@y)              
+            ypp=np.linalg.solve(M,f(t,y)-C(M,K(t,y))@yp-K(t,y)@y)              
         return t + h, ypp
     
     def step_Newmark_explicit(self,t,y,yp,ypp,h,opts):
@@ -97,7 +97,7 @@ class Second_Order(Explicit_ODE):
         if C==None:
             ypp_new=np.linalg.solve(M,f(t,y)-K(t,y)@y)
         else:
-            ypp_new=np.linalg.solve(M,f(t,y)-C@yp-K(t,y)@y)            
+            ypp_new=np.linalg.solve(M,f(t,y)-C(M,K(t,y))@yp-K(t,y)@y)            
         yp=yp+ypp*h/2+ypp_new*h/2
         return t+h,y,yp,ypp_new
             
