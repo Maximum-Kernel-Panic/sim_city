@@ -13,6 +13,7 @@ from assimulo.ode import *
 import numpy as np
 import matplotlib.pyplot as mpl
 import scipy.linalg as SL
+import scipy.sparse.linalg as ssl
 # from assimulo.solvers import CVode
 
 class HHT_a(Explicit_ODE):
@@ -20,8 +21,8 @@ class HHT_a(Explicit_ODE):
     HHT_a
     """
     tol=1.e-8     
-    maxit=10000     
-    maxsteps=500000
+    maxit=100000     
+    maxsteps=200000
     
     def __init__(self, problem, alpha=0):
         Explicit_ODE.__init__(self, problem) #Calls the base class
@@ -53,22 +54,27 @@ class HHT_a(Explicit_ODE):
         h = min(h, abs(tf-t))
         
         #Lists for storing the result
-        tres = [t]
+        tres = []
         yres = []
-
+        ypres = []
+        
+        yp = y[int(len(y)/2):]
+        y = y[:int(len(y)/2)]
         for i in range(self.maxsteps):
             if t >= tf:
                 break
             self.statistics["nsteps"] += 1
             if i == 0:
-                y = self.init_HHT(t,y)
-                curr_y = y
+                ypp = self.init_HHT(t,y,yp)
+
+            else:    
+                t, y, yp, ypp = self.HHT_step(t,y,yp,ypp,h)
                 yres.append(y.copy())
-              
-            t, y = self.HHT_step(t,y,h)
-            yres.append(y.copy())
-            tres.append(t)
+                tres.append(t)
             
+            
+            tres.append(t)
+            yres.append(np.concatenate((y.copy(),yp.copy())))
         
             h=min(self.h,np.abs(tf-t))
         else:
@@ -76,40 +82,32 @@ class HHT_a(Explicit_ODE):
         
         return ID_PY_OK, tres, yres
     
-    def init_HHT(self,t,y):
-            u = y[0:int(len(y)/2)]
-            up = y[int(len(y)/2):]
-            rhs = self.f(t,y) - self.problem.C@up - self.problem.K(t,u)@u     
-            upp = np.linalg.solve(self.problem.M,rhs)
-            y[int(2*len(y)/3):] = upp
-            return y
+    def init_HHT(self,t,y,yp):
+            rhs = self.f(t,np.concatenate((y.copy(),yp.copy())))[:int(len(y))] - self.problem.C@yp - self.problem.K(t,y)@y     
+            ypp = ssl.spsolve(self.problem.M,rhs)
+            return ypp
         
-    def HHT_step(self,t,y,h):
-            yf = y[:int(2*len(y)/3)]
-            u = y[0:int(len(y)/3)]
-            up = y[int(len(y)/3):int(2*len(y)/3)]
-            upp = y[int(2*len(y)/3):]
+    def HHT_step(self,t,y,yp,ypp,h):
             # PLACEHOLDER f !!!
             # Is the fucntion fixed step? 
             
             # eq 8''
-            rhs1 =  self.problem.M@(u/(self.beta*(h**2)) + up/(self.beta*h) + (1/(2*self.beta) - 1)*upp)
-            rhs2 =  self.problem.C@( (self.gamma*u)/(self.beta*h) - (1- self.gamma/self.beta)*up -(1 - (self.gamma/(2*self.beta)))*h*upp)
-            rhs3 = self.alpha*self.problem.K(t,u)@u
-            rhs = self.f(t,u) + rhs1 + rhs2 + rhs3
+            rhs1 =  self.problem.M@(y/(self.beta*(h**2)) + yp/(self.beta*h) + (1/(2*self.beta) - 1)*ypp)
+            rhs2 = self.problem.C@( (self.gamma*y)/(self.beta*h) - (1- self.gamma/self.beta)*yp -(1 - (self.gamma/(2*self.beta)))*h*ypp)
+            rhs3 = self.alpha*self.problem.K(t,y)@y
+            rhs = self.f(t,np.concatenate((y.copy(),yp.copy())))[:int(len(y))] + rhs1 + rhs2 + rhs3
             
-            lhs = ( self.problem.M/(self.beta*h**2) + (self.gamma*self.problem.C)/(self.beta*h) + (1 + self.alpha)*self.problem.K(t,u))
-            utp1 = np.linalg.solve(lhs,rhs)
+            lhs = ( self.problem.M/(self.beta*h**2) + (self.gamma*self.problem.C)/(self.beta*h) + (1 + self.alpha)*self.problem.K(t,y))
+            ytp1 = ssl.spsolve(lhs,rhs)
                         
             # eq 6'
-            upptp1 = (utp1 - u)/(self.beta*h**2) - up/(self.beta*h) - (1/(2*self.beta) - 1)*upp
+            ypptp1 = (ytp1 - y)/(self.beta*h**2) - yp/(self.beta*h) - (1/(2*self.beta) - 1)*ypp
             
             # eq 7'
-            uptp1 = (self.gamma/self.beta)*(utp1-u)/h + (1 - self.gamma/self.beta)*up + (1 - (self.gamma/(2*self.beta)))*h*upp
+            yptp1 = (self.gamma/self.beta)*(ytp1-y)/h + (1 - self.gamma/self.beta)*yp + (1 - (self.gamma/(2*self.beta)))*h*ypp
             
-            ytp1 = np.append(utp1,uptp1,0)
-            ytp1 = np.append(ytp1,upptp1,0)
-            return t+h,ytp1
+
+            return t+h,ytp1, yptp1,ypptp1
             
     def print_statistics(self, verbose=NORMAL):
         self.log_message('Final Run Statistics            : {name} \n'.format(name=self.problem.name),        verbose)

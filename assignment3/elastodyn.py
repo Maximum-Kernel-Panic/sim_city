@@ -23,6 +23,7 @@ from dune.fem.space import dgonb as dgSpace
 
 from dune.fem.operator import galerkin as galerkinOperator
 from dune.fem.operator import linear as linearOperator
+import Explicit_Problem_2nd as ex2
 
 import scipy.sparse as ssp
 import scipy.sparse.linalg as ssl
@@ -159,16 +160,26 @@ if __name__ == '__main__':
     # test section using build-in ODE solver from Assimulo
     t_end = 8
     beam_class = elastodynamic_beam(2, T=t_end)
-
+    M = beam_class.Mass_mat
+    K = beam_class.Stiffness_mat
+    C = beam_class.Dampening_mat
+    f = beam_class.F
     import assimulo.solvers as aso
     import assimulo.ode as aode
+    import HHT_a as HHT
 
+   
     # y , ydot
-    beam_problem = aode.Explicit_Problem(beam_class.rhs,y0=np.zeros((2*beam_class.ndofs,)))
+    # def Kfnc(t,y):
+    #    return K
+    
+    beam_problem = ex2.Explicit_Problem_2nd(beam_class.rhs,y0=np.zeros((2*beam_class.ndofs,)),t0=0,M=M,K=K,C=C)
     beam_problem.name='Modified Elastodyn example from DUNE-FEM'
 
     #beamCV = aso.ImplicitEuler(beam_problem) # CVode solver instance
     beamCV = aso.Radau5ODE(beam_problem)
+    #beamCV = HHT.HHT_a(beam_problem)
+  
     beamCV.h = 0.05 # constant step size here
     tt, y = beamCV.simulate(t_end)
 
