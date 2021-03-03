@@ -77,14 +77,15 @@ class HHT_a(Explicit_ODE):
         return ID_PY_OK, tres, yres
     
     def init_HHT(self,t,y):
-            u = y[0:int(len(y)/3)]
-            up = y[int(len(y)/3):int(2*len(y)/3)]
-            rhs = self.f(t,u) - self.problem.C@up - self.problem.K(t,u)@u     
+            u = y[0:int(len(y)/2)]
+            up = y[int(len(y)/2):]
+            rhs = self.f(t,y) - self.problem.C@up - self.problem.K(t,u)@u     
             upp = np.linalg.solve(self.problem.M,rhs)
             y[int(2*len(y)/3):] = upp
             return y
         
     def HHT_step(self,t,y,h):
+            yf = y[:int(2*len(y)/3)]
             u = y[0:int(len(y)/3)]
             up = y[int(len(y)/3):int(2*len(y)/3)]
             upp = y[int(2*len(y)/3):]
