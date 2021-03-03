@@ -16,15 +16,14 @@ import HHT_a as HHT
 
 
 
-def rhs(t,y):
+def rhs(t,y):    
     yd = np.array([0, -1])
-    
     return yd
 
 def K(t,y):
     k = 2000
     lmd = k*(np.sqrt(y[0]*y[0] + y[1]*y[1])-1)/np.sqrt(y[0]*y[0] + y[1]*y[1])
-    yd=np.array([[lmd,0],[0,lmd]]) 
+    yd=np.array([[lmd,0],[0,lmd]])
     return yd
    
 
@@ -42,7 +41,7 @@ model = Explicit_Problem_2nd.Explicit_Problem_2nd(rhs, y0, t0,M=np.eye(2),K=K)
 model.name = 'Linear Test ODE'
 
 sim = HHT.HHT_a(model)
-tfinal = 20.0
+tfinal = 20
 
 t, y = sim.simulate(tfinal)
 mpl.plot(t,y[:,0])

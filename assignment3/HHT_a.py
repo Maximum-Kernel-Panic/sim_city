@@ -55,15 +55,16 @@ class HHT_a(Explicit_ODE):
         #Lists for storing the result
         tres = [t]
         yres = []
-        y = self.init_HHT(t,y)
-        curr_y = y
-        yres.append(y.copy())
+
         for i in range(self.maxsteps):
             if t >= tf:
                 break
             self.statistics["nsteps"] += 1
-          
-            
+            if i == 0:
+                y = self.init_HHT(t,y)
+                curr_y = y
+                yres.append(y.copy())
+              
             t, y = self.HHT_step(t,y,h)
             yres.append(y.copy())
             tres.append(t)
@@ -91,8 +92,8 @@ class HHT_a(Explicit_ODE):
             # Is the fucntion fixed step? 
             
             # eq 8''
-            rhs1 =  self.problem.M@(u/(self.beta*h**2) + up/(self.beta*h) + (1/(2*self.beta) - 1)*upp)
-            rhs2 =  self.problem.C@( (self.gamma/(self.beta*h))*u - (1- self.gamma/self.beta)*up -(1 - (self.gamma/(2*self.beta)))*h*upp)
+            rhs1 =  self.problem.M@(u/(self.beta*(h**2)) + up/(self.beta*h) + (1/(2*self.beta) - 1)*upp)
+            rhs2 =  self.problem.C@( (self.gamma*u)/(self.beta*h) - (1- self.gamma/self.beta)*up -(1 - (self.gamma/(2*self.beta)))*h*upp)
             rhs3 = self.alpha*self.problem.K(t,u)@u
             rhs = self.f(t,u) + rhs1 + rhs2 + rhs3
             
