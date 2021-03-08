@@ -34,7 +34,7 @@ yinit = np.cos(20*np.pi/180)
 xpinit=0
 ypinit=0
 sqrt2 = np.sqrt(0.5);
-y0 = list((np.array([xinit,yinit]),np.array([xpinit,ypinit]), np.array([0,0])))
+y0 = list((np.array([xinit,yinit]),np.array([xpinit,ypinit])))
 t0 = 0.0
 K(0,y0)
 model = Explicit_Problem_2nd.Explicit_Problem_2nd(rhs, y0, t0,M=np.eye(2),K=K)
