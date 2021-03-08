@@ -22,7 +22,7 @@ class HHT_a(Explicit_ODE):
     """
     tol=1.e-8     
     maxit=100000     
-    maxsteps=200000
+    maxsteps=20000
     
     def __init__(self, problem, alpha=0):
         Explicit_ODE.__init__(self, problem) #Calls the base class
@@ -69,8 +69,6 @@ class HHT_a(Explicit_ODE):
 
             else:    
                 t, y, yp, ypp = self.HHT_step(t,y,yp,ypp,h)
-                yres.append(y.copy())
-                tres.append(t)
             
             
             tres.append(t)
