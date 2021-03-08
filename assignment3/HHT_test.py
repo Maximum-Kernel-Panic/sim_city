@@ -21,7 +21,7 @@ def rhs(t,y):
     return yd
 
 def K(t,y):
-    k = 2000
+    k = 200
     lmd = k*(np.sqrt(y[0]*y[0] + y[1]*y[1])-1)/np.sqrt(y[0]*y[0] + y[1]*y[1])
     yd=np.array([[lmd,0],[0,lmd]])
     return yd
@@ -34,13 +34,13 @@ yinit = np.cos(20*np.pi/180)
 xpinit=0
 ypinit=0
 sqrt2 = np.sqrt(0.5);
-y0 = list((np.array([xinit,yinit]),np.array([xpinit,ypinit])))
+y0 = list((np.array([xinit,yinit]),np.array([xpinit,ypinit]), np.array([0,0])))
 t0 = 0.0
 K(0,y0)
 model = Explicit_Problem_2nd.Explicit_Problem_2nd(rhs, y0, t0,M=np.eye(2),K=K)
 model.name = 'Linear Test ODE'
 
-sim = HHT.HHT_a(model)
+sim = HHT.HHT_a(model,-1/3)
 tfinal = 20
 
 t, y = sim.simulate(tfinal)
