@@ -161,9 +161,12 @@ if __name__ == '__main__':
     t_end = 8
     beam_class = elastodynamic_beam(2, T=t_end)
     M = beam_class.Mass_mat
-    K = beam_class.Stiffness_mat
-    C = beam_class.Dampening_mat
-    f = beam_class.F
+    def C(k,y):
+        return beam_class.Dampening_mat
+    def f(k,y):
+        return beam_class.F
+    def K(k,y):
+        return beam_class.Stiffness_mat
     import assimulo.solvers as aso
     import assimulo.ode as aode
     #import HHT_a as HHT
@@ -174,7 +177,7 @@ if __name__ == '__main__':
     # def Kfnc(t,y):
     #    return K
     
-    beam_problem = ex2.Explicit_Problem_2nd(M,K,beam_class.rhs,np.zeros((2*beam_class.ndofs,)),t0=0,C=C)
+    beam_problem = ex2.Explicit_Problem_2nd(M,K,beam_class.rhs,np.zeros((2*beam_class.ndofs,)),0,C=C)
     beam_problem.name='Modified Elastodyn example from DUNE-FEM'
 
     #beamCV = aso.ImplicitEuler(beam_problem) # CVode solver instance

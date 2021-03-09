@@ -86,9 +86,9 @@ class Explicit_Newmark(Explicit_ODE):
         C = self.problem.C
         K = self.problem.K
         if C==None:
-            ypp=np.linalg.solve(M,f(t,y)-K(t,y)@y)
+            ypp=ssl.spsolve(M,f(t,y)-K(t,y)@y)
         else:
-            ypp=np.linalg.solve(M,f(t,y)-C(M,K(t,y))@yp-K(t,y)@y)              
+            ypp=ssl.spsolve(M,f(t,y)-C(M,K(t,y))@yp-K(t,y)@y)              
         return t + h, ypp
     
     def step_Newmark_explicit(self,t,y,yp,ypp,h,opts):
@@ -98,9 +98,9 @@ class Explicit_Newmark(Explicit_ODE):
         K = self.problem.K        
         y=y+yp*h+ypp*h**2/2
         if C==None:
-            ypp_new=np.linalg.solve(M,f(t,y)-K(t,y)@y)
+            ypp_new=ssl.spsolve(M,f(t,y)-K(t,y)@y)
         else:
-            ypp_new=np.linalg.solve(M,f(t,y)-C(M,K(t,y))@yp-K(t,y)@y)            
+            ypp_new=ssl.spsolve(M,f(t,y)-C(M,K(t,y))@yp-K(t,y)@y)            
         yp=yp+ypp*h/2+ypp_new*h/2
         return t+h,y,yp,ypp_new
             
