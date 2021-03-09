@@ -40,8 +40,8 @@ class elastodynamic_beam:
     rho = Constant(1.0, name="rho")
 
     # Rayleigh damping coefficients
-    eta_m = Constant(0.0, name="eta_m")
-    eta_k = Constant(0.0, name="eta_k")
+    eta_m = Constant(0.2, name="eta_m")
+    eta_k = Constant(0.2, name="eta_k")
 
     def __init__(self, gridsize, T = 4.0, dimgrid=2):
 
@@ -159,7 +159,7 @@ class elastodynamic_beam:
 if __name__ == '__main__':
     # test section using build-in ODE solver from Assimulo
     t_end = 8
-    beam_class = elastodynamic_beam(2, T=t_end)
+    beam_class = elastodynamic_beam(1, T=t_end)
     M = beam_class.Mass_mat
     def C(k,y):
         return beam_class.Dampening_mat
@@ -177,12 +177,12 @@ if __name__ == '__main__':
     # def Kfnc(t,y):
     #    return K
     
-    beam_problem = ex2.Explicit_Problem_2nd(M,K,beam_class.rhs,np.zeros((2*beam_class.ndofs,)),0,C=C)
+    beam_problem = ex2.Explicit_Problem_2nd(M,K,f,np.zeros((2*beam_class.ndofs,)),0,C=C)
     beam_problem.name='Modified Elastodyn example from DUNE-FEM'
 
     #beamCV = aso.ImplicitEuler(beam_problem) # CVode solver instance
     #beamCV = aso.Radau5ODE(beam_problem)
-    beamCV = Second_Order.HHT_a(beam_problem)
+    beamCV = Second_Order.HHT_a(beam_problem,alpha=-0)
     #beamCV = Second_Order.Explicit_Newmark(beam_problem)
   
     beamCV.h = 0.05 # constant step size here
@@ -195,7 +195,7 @@ if __name__ == '__main__':
         disp_tip.append(beam_class.evaluateAt(y[i], [1, 0.05]))
         if t > plottime:
             print(f"Beam position at t={t}")
-            beam_class.plotBeam( y[i] )
+            #beam_class.plotBeam( y[i] )
             plottime += plotstep
 
     pl.figure()
