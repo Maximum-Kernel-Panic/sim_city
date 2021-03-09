@@ -58,6 +58,7 @@ class HHT_a(Explicit_ODE):
         yres = []
         ypres = []
         
+        # NOTE yp BEFORE y
         yp = y[int(len(y)/2):]
         y = y[:int(len(y)/2)]
         for i in range(self.maxsteps):
