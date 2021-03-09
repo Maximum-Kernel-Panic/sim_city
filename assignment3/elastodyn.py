@@ -24,6 +24,7 @@ from dune.fem.space import dgonb as dgSpace
 from dune.fem.operator import galerkin as galerkinOperator
 from dune.fem.operator import linear as linearOperator
 import Explicit_Problem_2nd as ex2
+import Second_Order as so
 
 import scipy.sparse as ssp
 import scipy.sparse.linalg as ssl
@@ -159,7 +160,7 @@ class elastodynamic_beam:
 if __name__ == '__main__':
     # test section using build-in ODE solver from Assimulo
     t_end = 8
-    beam_class = elastodynamic_beam(2, T=t_end)
+    beam_class = elastodynamic_beam(1, T=t_end)
     M = beam_class.Mass_mat
     K = beam_class.Stiffness_mat
     C = beam_class.Dampening_mat
@@ -168,18 +169,20 @@ if __name__ == '__main__':
     import assimulo.ode as aode
     import HHT_a as HHT
 
-   
-    # y , ydot
-    # def Kfnc(t,y):
-    #    return K
+    def fnc(t,y):
+        return f
+
+    def Kfnc(t,y):
+        return K
     
-    beam_problem = ex2.Explicit_Problem_2nd(beam_class.rhs,y0=np.zeros((2*beam_class.ndofs,)),t0=0,M=M,K=K,C=C)
+    #beam_problem.rhs
+    beam_problem = ex2.Explicit_Problem_2nd(fnc,y0=np.zeros((2*beam_class.ndofs,)),t0=0,M=M,K=Kfnc,C=C)
     beam_problem.name='Modified Elastodyn example from DUNE-FEM'
 
     #beamCV = aso.ImplicitEuler(beam_problem) # CVode solver instance
-    beamCV = aso.Radau5ODE(beam_problem)
-    #beamCV = HHT.HHT_a(beam_problem)
-  
+    #beamCV = aso.Radau5ODE(beam_problem)
+    beamCV = HHT.HHT_a(beam_problem,-1/3)
+    #beamCV = so.Second_Order(beam_problem)
     beamCV.h = 0.05 # constant step size here
     tt, y = beamCV.simulate(t_end)
 
@@ -190,7 +193,7 @@ if __name__ == '__main__':
         disp_tip.append(beam_class.evaluateAt(y[i], [1, 0.05]))
         if t > plottime:
             print(f"Beam position at t={t}")
-            beam_class.plotBeam( y[i] )
+            #beam_class.plotBeam( y[i] )
             plottime += plotstep
 
     pl.figure()
