@@ -37,7 +37,7 @@ sqrt2 = np.sqrt(0.5);
 y0 = list((np.array([xinit,yinit]),np.array([xpinit,ypinit])))
 t0 = 0.0
 K(0,y0)
-model = Explicit_Problem_2nd.Explicit_Problem_2nd(rhs, y0, t0,M=np.eye(2),K=K)
+model = Explicit_Problem_2nd.Explicit_Problem_2nd(np.eye(2),K,rhs, y0, t0)
 model.name = 'Linear Test ODE'
 
 sim = HHT.HHT_a(model,-1/3)
