@@ -182,8 +182,8 @@ if __name__ == '__main__':
 
     #beamCV = aso.ImplicitEuler(beam_problem) # CVode solver instance
     #beamCV = aso.Radau5ODE(beam_problem)
-    #beamCV = Second_Order.HHT_a(beam_problem)
-    beamCV = Second_Order.Explicit_Newmark(beam_problem)
+    beamCV = Second_Order.HHT_a(beam_problem)
+    #beamCV = Second_Order.Explicit_Newmark(beam_problem)
   
     beamCV.h = 0.05 # constant step size here
     tt, y = beamCV.simulate(t_end)

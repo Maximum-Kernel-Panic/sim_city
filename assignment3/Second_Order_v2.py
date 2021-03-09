@@ -86,9 +86,9 @@ class Explicit_Newmark(Explicit_ODE):
         C = self.problem.C
         K = self.problem.K
         if C==None:
-            ypp=ssl.spsolve(M,f(t,y)-K(t,y)@y)
+            ypp=ssl.spsolve(M,f(t,np.concatenate((y.copy(),yp.copy())))[:int(len(y))]-K(t,y)@y)
         else:
-            ypp=ssl.spsolve(M,f(t,y)-C(M,K(t,y))@yp-K(t,y)@y)              
+            ypp=ssl.spsolve(M,f(t,np.concatenate((y.copy(),yp.copy())))[:int(len(y))]-C(M,K(t,y))@yp-K(t,y)@y)              
         return t + h, ypp
     
     def step_Newmark_explicit(self,t,y,yp,ypp,h,opts):
@@ -98,9 +98,9 @@ class Explicit_Newmark(Explicit_ODE):
         K = self.problem.K        
         y=y+yp*h+ypp*h**2/2
         if C==None:
-            ypp_new=ssl.spsolve(M,f(t,y)-K(t,y)@y)
+            ypp_new=ssl.spsolve(M,f(t,np.concatenate((y.copy(),yp.copy())))[:int(len(y))]-K(t,y)@y)
         else:
-            ypp_new=ssl.spsolve(M,f(t,y)-C(M,K(t,y))@yp-K(t,y)@y)            
+            ypp_new=ssl.spsolve(M,f(t,np.concatenate((y.copy(),yp.copy())))[:int(len(y))]-C(M,K(t,y))@yp-K(t,y)@y)            
         yp=yp+ypp*h/2+ypp_new*h/2
         return t+h,y,yp,ypp_new
             
@@ -182,7 +182,7 @@ class HHT_a(Explicit_ODE):
         return ID_PY_OK, tres, yres
     
     def init_HHT(self,t,y,yp):
-            rhs = self.f(t,np.concatenate((y.copy(),yp.copy())))[:int(len(y))] - self.problem.C@yp - self.problem.K(t,y)@y     
+            rhs = self.f(t,np.concatenate((y.copy(),yp.copy())))[:int(len(y))] - self.problem.C(0,0)@yp - self.problem.K(t,y)@y     
             ypp = ssl.spsolve(self.problem.M,rhs)
             return ypp
         
@@ -192,11 +192,11 @@ class HHT_a(Explicit_ODE):
             
             # eq 8''
             rhs1 =  self.problem.M@(y/(self.beta*(h**2)) + yp/(self.beta*h) + (1/(2*self.beta) - 1)*ypp)
-            rhs2 = self.problem.C@( (self.gamma*y)/(self.beta*h) - (1- self.gamma/self.beta)*yp -(1 - (self.gamma/(2*self.beta)))*h*ypp)
+            rhs2 = self.problem.C(0,0)@( (self.gamma*y)/(self.beta*h) - (1- self.gamma/self.beta)*yp -(1 - (self.gamma/(2*self.beta)))*h*ypp)
             rhs3 = self.alpha*self.problem.K(t,y)@y
             rhs = self.f(t,np.concatenate((y.copy(),yp.copy())))[:int(len(y))] + rhs1 + rhs2 + rhs3
             
-            lhs = ( self.problem.M/(self.beta*h**2) + (self.gamma*self.problem.C)/(self.beta*h) + (1 + self.alpha)*self.problem.K(t,y))
+            lhs = ( self.problem.M/(self.beta*h**2) + (self.gamma*self.problem.C(0,0))/(self.beta*h) + (1 + self.alpha)*self.problem.K(t,y))
             ytp1 = ssl.spsolve(lhs,rhs)
                         
             # eq 6'
