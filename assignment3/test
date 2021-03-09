@@ -1,0 +1,18 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Fri Feb 26 12:39:06 2021
+
+@author: kadde
+"""
+
+from assimulo.solvers import CVode
+from assimulo.explicit_ode import Explicit_ODE
+from assimulo.ode import *
+import numpy as np
+import matplotlib.pyplot as mpl
+import Explicit_Problem_2nd as ep2
+
+a = lambda x: x
+
+ep2.Explicit_Problem_2nd(a, 1, 1)
