@@ -14,12 +14,13 @@ from scipy.linalg import inv
 from assimulo.explicit_ode import Explicit_ODE
 #import matplotlib.pyplot as mpl
 import Explicit_Problem_2nd
+import scipy.sparse.linalg as ssl
 
 class Explicit_Problem_MCK_to_1wrap(Explicit_Problem_2nd.Explicit_Problem_2nd):
     
     def __init__(self, M, K, rhs, y0, t0, C=None):
         Explicit_Problem_2nd.Explicit_Problem_2nd.__init__(self, M, K, rhs, y0, t0, C=C)
-        self.Mm1 = inv(M)
+        self.M = M
         self.x0 = y0[0]
         self.x0d = y0[1]
         self.F = rhs
@@ -29,9 +30,9 @@ class Explicit_Problem_MCK_to_1wrap(Explicit_Problem_2nd.Explicit_Problem_2nd):
     def convRHS(self, t, x, xd):
         Kt = self.K(t,x)
         if not self.C==None:
-            xdd = self.Mm1@(self.rhs(t,x)-self.C(self.M,Kt)@np.transpose(xd)-Kt@np.transpose(x))
+            xdd = ssl.spsolve(self.M,(self.rhs(t,x)-self.C(self.M,Kt)@np.transpose(xd)-Kt@np.transpose(x)))
         else:
-            xdd = self.Mm1@(self.rhs(t,x)-Kt@np.transpose(x))          
+            xdd = ssl,spsolve(self.M,(self.rhs(t,x)-Kt@np.transpose(x)))          
         return xdd
     
     def makeModel(self):
